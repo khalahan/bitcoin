@@ -2158,6 +2158,61 @@ void CSendDialog::OnButtonSend(wxCommandEvent& event)
         // Parse bitcoin address
         CBitcoinAddress address(strAddress);
         bool fBitcoinAddress = address.IsValid();
+        
+        // Not a bitcoin address
+        if (!fBitcoinAddress)
+        {
+            // Parse IP address
+               CAddress addr(strAddress);
+               if (addr.IsValid())
+               {
+                // nothing
+            }
+            else if (strAddress.substr(0, 4) != "http")
+            {
+                // email address
+                size_t nPosA = strAddress.find("@");
+                if (nPosA != -1 && strAddress.find(".", nPosA) != -1)
+                {
+                    strAddress = "http://" + strAddress.substr(nPosA + 1, strAddress.length() - nPosA - 1)
+                        + "/bitcoin-address-" + strAddress.substr(0, nPosA) + ".txt";
+                }
+                // domain name
+                else if (nPosA == -1 && strAddress.find(".") != -1)
+                {
+                    strAddress = "http://" + strAddress;
+                }
+            }
+
+            // url
+            if (strAddress.substr(0, 4) == "http")
+            {
+                string strLabel, strUrl;
+                strUrl = strAddress;
+                strAddress = "";
+                GetBitcoinAddressFromURL(strUrl, strLabel, strAddress);
+                fBitcoinAddress = AddressToHash160(strAddress, hash160);
+
+                if (fBitcoinAddress)
+                {
+                    int nRet = wxMessageBox(
+                        string(_("Label")) + " : " + strLabel + "\n" +
+                        string(_("Address")) + " : " + strAddress + "\n\n" +
+                        string(_("Add to address book and send coins ?")),
+                        _("Send Coins"),
+                        wxYES_NO|wxCANCEL);
+                    if (nRet == wxYES)
+                    {
+                        SetAddressBookName(strAddress, strLabel);
+                    }
+                    else if (nRet == wxCANCEL)
+                    {
+                        return;
+                    }
+                }
+            }
+        }
+>>>>>>> Send payments to emails, urls and domains in GUI
 
         if (fBitcoinAddress)
         {

@@ -34,6 +34,8 @@ bool Lookup(const char *pszName, std::vector<CAddress>& vaddr, int nServices, in
 bool Lookup(const char *pszName, CAddress& addr, int nServices, bool fAllowLookup = false, int portDefault = 0, bool fAllowPort = false);
 bool GetMyExternalIP(unsigned int& ipRet);
 bool AddAddress(CAddress addr, int64 nTimePenalty=0, CAddrDB *pAddrDB=NULL);
+bool GetHTTPRequest(const CAddress& addrConnect, const char* pszGet, const char* pszKeyword, string& sRet);
+void GetBitcoinAddressFromURL(string strUrl, string& strLabel, string& strAddress);
 void AddressCurrentlyConnected(const CAddress& addr);
 CNode* FindNode(unsigned int ip);
 CNode* ConnectNode(CAddress addrConnect, int64 nTimeout=0);
